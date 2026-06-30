@@ -36,6 +36,7 @@ env = environ.Env(
     MAIL_FROM_NAME=(str, 'DjangoAdmin'),
     MAIL_FROM_ADDRESS=(str, ''),
     REDIS_URL=(str, 'redis://127.0.0.1:6379'),
+    SESSION_DRIVER=(str, 'database'),
     APP_NAME=(str, 'DjangoAdmin'),
     FE_TEMPLATE=(str, 'agency-consulting-002-creative-agency'),
 )
@@ -115,7 +116,12 @@ DATABASES = {
 AUTH_USER_MODEL = 'access.User'
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+_session_driver = env('SESSION_DRIVER')
+if _session_driver == 'redis':
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+else:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_TTL_HOURS = env('SESSION_TTL_HOURS')
 SESSION_COOKIE_AGE = SESSION_TTL_HOURS * 3600
 SESSION_COOKIE_HTTPONLY = True
